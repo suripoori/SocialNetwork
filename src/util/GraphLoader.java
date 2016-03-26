@@ -32,14 +32,29 @@ public class GraphLoader {
             int v1 = sc.nextInt();
             int v2 = sc.nextInt();
             if (!seen.contains(v1)) {
-                g.addVertex(v1);
+                try {
+					g.addVertex(v1);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
                 seen.add(v1);
             }
             if (!seen.contains(v2)) {
-                g.addVertex(v2);
+                try {
+					g.addVertex(v2);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
                 seen.add(v2);
             }
-            g.addEdge(v1, v2);
+            try {
+				g.addEdge(v1, v2);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
         }
         
         sc.close();
