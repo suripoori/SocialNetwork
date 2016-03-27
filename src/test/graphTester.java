@@ -1,6 +1,7 @@
 package test;
 import graph.CapGraph;
 import graph.Graph;
+import util.GraphLoader;
 import static org.junit.Assert.*;
 
 import java.util.HashMap;
@@ -9,14 +10,13 @@ import java.util.HashSet;
 import org.junit.Before;
 import org.junit.Test;
 
-import org.junit.Before;
-
 public class graphTester {
 	public Graph graph1;
-	
+	public Graph graph2;
 	@Before
 	public void setUp() throws Exception {
 		graph1 = new CapGraph();
+		graph2 = new CapGraph();
 	}
 	
 	@Test
@@ -224,6 +224,154 @@ public class graphTester {
 		catch(Exception e) {
 			e.printStackTrace();
 			fail("Adding a lot of edges between existing vertices causes exception");
+		}
+	}
+	
+	@Test
+	public void testRealWorld1() {
+		try{
+			GraphLoader.loadGraph(graph1, "data/facebook_2000.txt");
+			System.out.println(graph1.exportGraph());
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			fail("Real world test with facebook_2000.txt failed");
+		}
+	}
+	
+	@Test
+	public void testRealWorld2() {
+		try{
+			GraphLoader.loadGraph(graph1, "data/small_test_graph.txt");
+			System.out.println(graph1.exportGraph());
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			fail("Real world test with small_test_graph.txt failed");
+		}
+	}
+	
+	@Test
+	public void testEgoNet() {
+		try{
+			if (graph1.getEgonet(3) != null) {
+				fail("Getting EgoNet of an empty graph is not null");
+			}
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			fail("Getting EgoNet from an empty graph causes exception");
+		}
+		
+		GraphLoader.loadGraph(graph1, "data/small_test_graph.txt");
+		
+		try{
+			Graph ego = graph1.getEgonet(1);
+			for (int i=1; i<4; i++) {
+				if (!ego.exportGraph().containsKey(i)) {
+					fail("Egonet of 1 in small_test_graph should contain " + i);
+				}
+			}
+			if (ego.getNumVertices() > 3) {
+				fail("Egonet of 1 should not contain more than 3 vertices in small test graph");
+			}
+			if (!ego.exportGraph().get(1).contains(2) || !ego.exportGraph().get(1).contains(3)) {
+				fail("Egonet of 1 should have 2 and 3 as 1's neighbors");
+			}
+			if (ego.exportGraph().get(1).contains(1)) {
+				fail("Egonet of 1 should not have 1 as 1's neighbor");
+			}
+			if (!ego.exportGraph().get(2).contains(3) || !ego.exportGraph().get(2).contains(1)) {
+				fail("Egonet of 1 should have 1 and 3 as 2's neighbors");
+			}
+			if (ego.exportGraph().get(2).contains(2)) {
+				fail("Egonet of 1 should not have 2 as 2's neighbor");
+			}
+			if (!ego.exportGraph().get(3).contains(1) || !ego.exportGraph().get(3).contains(2)) {
+				fail("Egonet of 1 should have 1 and 2 as 3's neighbors");
+			}
+			if (ego.exportGraph().get(3).contains(3)) {
+				fail("Egonet of 1 should not have 3 as 3's neighbor");
+			}
+			if (ego.exportGraph().get(3).contains(7)) {
+				fail("Egonet of 1 should not contain 7 as 3's neighbor");
+			}
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			fail("Getting EgoNet from a small test graph causes exception");
+		}
+		
+		try{
+			GraphLoader.loadGraph(graph2, "data/facebook_2000.txt");
+			Graph ego;
+			for (Integer v : graph2.exportGraph().keySet()) {
+				ego = graph2.getEgonet(v);
+				System.out.println(ego.exportGraph());
+			}
+		}
+		catch(Exception e) {
+			fail("Getting EgoNet from facebook_2000.txt graph causes exception");
+		}
+	}
+	
+	@Test
+	public void testSCCs() {
+		try {
+			if (graph1.getSCCs().size() != 0) {
+				fail("Getting SCCs of empty graph returns non-empty list");
+			}
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			fail("Getting SCCs of empty graph causes exception");
+		}
+		
+		try {
+			graph1.addVertex(1);
+			graph1.addVertex(2);
+			graph1.addVertex(3);
+			graph1.addVertex(4);
+			graph1.addEdge(1, 2);
+			graph1.addEdge(2, 3);
+			graph1.addEdge(3, 4);
+			graph1.addEdge(4, 1);
+			for(Graph g : graph1.getSCCs()){
+				System.out.println(g.exportGraph());
+			}
+			if (graph1.getSCCs().size() != 1) {
+				fail("Getting SCCs of simple test returns list of size " + graph1.getSCCs().size() + "\n");
+			}
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			fail("Getting SCCs of simple test causes exception");
+		}
+		graph1 = new CapGraph();
+		
+		GraphLoader.loadGraph(graph1, "data/small_test_graph.txt");
+		try {
+			if (graph1.getSCCs().size() == 0) {
+				fail("Getting SCCs of small_test_graph returns empty list");
+			}
+			if (graph1.getSCCs().size() != 1) {
+				fail("Getting SCCs of small_test_graph returns list with more than one SCC: " + graph1.getSCCs().size());
+			}
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			fail("Getting SCCs of small_test_graph causes exception");
+		}
+		
+		GraphLoader.loadGraph(graph2, "data/facebook_2000.txt");
+		try {
+			if (graph2.getSCCs().size() == 0) {
+				fail("Getting SCCs of facebook_2000 graph returns empty list");
+			}
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			fail("Getting SCCs of facebook_2000 graph causes exception");
 		}
 	}
 }

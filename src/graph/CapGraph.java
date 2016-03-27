@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.Stack;
 
 /**
  * @author Your name here.
@@ -29,6 +29,11 @@ public class CapGraph implements Graph {
 		adjListMap = new HashMap<Integer, HashSet<Integer>>();
 		numVertices = 0;
 		numEdges = 0;
+	}
+	
+	@Override
+	public String toString() {
+		return "CapGraph [adjListMap=" + adjListMap + ", numVertices=" + numVertices + ", numEdges=" + numEdges + "]";
 	}
 	
 	@Override
@@ -56,6 +61,7 @@ public class CapGraph implements Graph {
 				this.numEdges++;
 			}
 			else {
+				//Do not allow to add a duplicate edge: Cannot be friends multiple times, cannot retweet multiple times
 				String message4 = "Attempt to add a duplicate edge!";
 				System.out.println(message4);
 			}
@@ -63,15 +69,18 @@ public class CapGraph implements Graph {
 		else {
 			if (!this.adjListMap.containsKey(from)) {
 				String message1 = "Vertex " + from + " does not exist!";
+				message1 += "\n Error when trying to add edge between " + from + " and " + to;
 				System.out.println(message1);
 				//throw new Exception(message1);
 			}
 			if (!this.adjListMap.containsKey(to)) {
 				String message2 = "Vertex " + to + " does not exist!";
+				message2 += "\n Error when trying to add edge between " + from + " and " + to;
 				System.out.println(message2);
 				//throw new Exception(message2);
 			}
 			if (from == to) {
+				//Do not allow edge from vertex to itself: Cannot retweet yourself, cannot be friends with yourself
 				String message3 = "Attempt to add edge from " + from + " to itself!";
 				System.out.println(message3);
 			}
@@ -84,6 +93,23 @@ public class CapGraph implements Graph {
 	@Override
 	public Graph getEgonet(int center) {
 		// TODO Auto-generated method stub
+		if(this.adjListMap.containsKey(center)) {
+			Graph egoNet = new CapGraph();
+			egoNet.addVertex(center);
+			for (Integer v : this.adjListMap.get(center)) {
+				egoNet.addVertex(v);
+				egoNet.addEdge(center, v);
+			}
+			HashMap<Integer, HashSet<Integer>> egoNetGraph = egoNet.exportGraph();
+			for (Integer v : egoNetGraph.keySet()) {
+				for (Integer neighbor : this.adjListMap.get(v)) {
+					if (egoNetGraph.containsKey(neighbor)) {
+						egoNet.addEdge(v, neighbor);
+					}
+				}
+			}
+			return egoNet;
+		}
 		return null;
 	}
 
@@ -93,9 +119,19 @@ public class CapGraph implements Graph {
 	@Override
 	public List<Graph> getSCCs() {
 		// TODO Auto-generated method stub
-		return null;
+		List<Graph> sccs = new ArrayList<Graph>();
+		Stack<Integer> vertices = new Stack<Integer>();
+		for (Integer i : this.adjListMap.keySet()) {
+			vertices.push(i);
+		}
+		System.out.println(vertices);
+		Stack<Integer> dfs1Finished = DFS(null, this, vertices);
+		System.out.println(dfs1Finished);
+		Stack<Integer> dfs2Finished = DFS(sccs, this.getTranspose(), dfs1Finished);
+		System.out.println(sccs);
+		return sccs;
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see graph.Graph#exportGraph()
 	 */
@@ -111,5 +147,51 @@ public class CapGraph implements Graph {
 	
 	public int getNumEdges(){
 		return this.numEdges;
+	}
+	
+	private Stack<Integer> DFS(List<Graph> SCCs, Graph g, Stack<Integer> vertices) {
+		HashSet<Integer> visited = new HashSet<Integer>();
+		Stack<Integer> finished = new Stack<Integer>();
+		while(!vertices.empty()) {
+			Integer v = vertices.pop();
+			Graph sccg = null;
+			if (!visited.contains(v)) {
+				if(SCCs != null) {
+					sccg = new CapGraph();
+					SCCs.add(sccg);
+					sccg.addVertex(v);
+				}
+				DFSVisit(g, v, visited, finished, sccg);
+			}
+		}
+		return finished;
+	}
+	
+	private void DFSVisit(Graph g, Integer v, HashSet<Integer> visited, Stack<Integer> finished, Graph sccg) {
+		visited.add(v);
+		for (Integer n : g.exportGraph().get(v)) {
+			if (!visited.contains(n)) {
+				if (sccg != null) {
+					sccg.addVertex(n);
+					sccg.addEdge(v, n);
+				}
+				DFSVisit(g, n, visited, finished, sccg);
+			}
+		}
+		finished.push(v);
+	}
+	
+	private Graph getTranspose() {
+		Graph gTranspose = new CapGraph();
+		for (Integer v : this.adjListMap.keySet()) {
+			gTranspose.addVertex(v);
+		}
+		for (Integer v : this.adjListMap.keySet()) {
+			for (Integer n : this.adjListMap.get(v)) {
+				gTranspose.addEdge(n, v);
+			}
+		}
+		System.out.println(gTranspose.exportGraph());
+		return gTranspose;
 	}
 }
