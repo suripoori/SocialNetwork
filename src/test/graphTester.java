@@ -13,10 +13,13 @@ import org.junit.Test;
 public class graphTester {
 	public Graph graph1;
 	public Graph graph2;
+	public Graph graph3;
+	
 	@Before
 	public void setUp() throws Exception {
 		graph1 = new CapGraph();
 		graph2 = new CapGraph();
+		graph3 = new CapGraph();
 	}
 	
 	@Test
@@ -252,6 +255,18 @@ public class graphTester {
 	}
 	
 	@Test
+	public void testRealWorld3() {
+		try{
+			GraphLoader.loadGraph(graph3, "data/twitter_higgs.txt");
+			//System.out.println(graph3.exportGraph());
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			fail("Real world test with larg test graph twitter_higgs.txt failed");
+		}
+	}
+	
+	@Test
 	public void testEgoNet() {
 		try{
 			if (graph1.getEgonet(3) != null) {
@@ -313,6 +328,18 @@ public class graphTester {
 		catch(Exception e) {
 			fail("Getting EgoNet from facebook_2000.txt graph causes exception");
 		}
+		
+		try{
+			GraphLoader.loadGraph(graph3, "data/twitter_higgs.txt");
+			Graph ego;
+			for (Integer v : graph3.exportGraph().keySet()) {
+				ego = graph3.getEgonet(v);
+				//System.out.println(ego.exportGraph());
+			}
+		}
+		catch(Exception e) {
+			fail("Getting EgoNet from large twitter_higgs.txt dataset causes exception");
+		}
 	}
 	
 	@Test
@@ -372,6 +399,17 @@ public class graphTester {
 		catch(Exception e) {
 			e.printStackTrace();
 			fail("Getting SCCs of facebook_2000 graph causes exception");
+		}
+		
+		GraphLoader.loadGraph(graph3, "data/twitter_higgs.txt");
+		try {
+			if (graph3.getSCCs().size() == 0) {
+				fail("Getting SCCs of twitter_higgs graph returns empty list");
+			}
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			fail("Getting SCCs of twitter_higgs graph causes exception");
 		}
 	}
 }

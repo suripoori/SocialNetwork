@@ -124,11 +124,11 @@ public class CapGraph implements Graph {
 		for (Integer i : this.adjListMap.keySet()) {
 			vertices.push(i);
 		}
-		System.out.println(vertices);
+		//System.out.println(vertices);
 		Stack<Integer> dfs1Finished = DFS(null, this, vertices);
-		System.out.println(dfs1Finished);
+		//System.out.println(dfs1Finished);
 		Stack<Integer> dfs2Finished = DFS(sccs, this.getTranspose(), dfs1Finished);
-		System.out.println(sccs);
+		//System.out.println(sccs);
 		return sccs;
 	}
 	
@@ -149,7 +149,7 @@ public class CapGraph implements Graph {
 		return this.numEdges;
 	}
 	
-	private Stack<Integer> DFS(List<Graph> SCCs, Graph g, Stack<Integer> vertices) {
+	private Stack<Integer> DFS(List<Graph> SCCs, CapGraph g, Stack<Integer> vertices) {
 		HashSet<Integer> visited = new HashSet<Integer>();
 		Stack<Integer> finished = new Stack<Integer>();
 		while(!vertices.empty()) {
@@ -167,22 +167,28 @@ public class CapGraph implements Graph {
 		return finished;
 	}
 	
-	private void DFSVisit(Graph g, Integer v, HashSet<Integer> visited, Stack<Integer> finished, Graph sccg) {
+	private void DFSVisit(CapGraph g, Integer v, HashSet<Integer> visited, Stack<Integer> finished, Graph sccg) {
 		visited.add(v);
-		for (Integer n : g.exportGraph().get(v)) {
-			if (!visited.contains(n)) {
-				if (sccg != null) {
-					sccg.addVertex(n);
-					sccg.addEdge(v, n);
+		try{
+			for (Integer n : g.getNeighbors(v)) {
+				if (!visited.contains(n)) {
+					if (sccg != null) {
+						sccg.addVertex(n);
+						sccg.addEdge(v, n);
+					}
+					DFSVisit(g, n, visited, finished, sccg);
 				}
-				DFSVisit(g, n, visited, finished, sccg);
 			}
+			finished.push(v);
 		}
-		finished.push(v);
+		catch(Exception e) {
+			e.printStackTrace();
+			System.out.println("Error when getting neighbors of " + v);
+		}
 	}
 	
-	private Graph getTranspose() {
-		Graph gTranspose = new CapGraph();
+	private CapGraph getTranspose() {
+		CapGraph gTranspose = new CapGraph();
 		for (Integer v : this.adjListMap.keySet()) {
 			gTranspose.addVertex(v);
 		}
@@ -191,7 +197,16 @@ public class CapGraph implements Graph {
 				gTranspose.addEdge(n, v);
 			}
 		}
-		System.out.println(gTranspose.exportGraph());
+		//System.out.println(gTranspose.exportGraph());
 		return gTranspose;
+	}
+	
+	private HashSet<Integer> getNeighbors(Integer v) throws Exception {
+		if (this.adjListMap.containsKey(v)) {
+			return this.adjListMap.get(v);
+		}
+		else {
+			throw new Exception("Vertex " + v + " not found");
+		}
 	}
 }
