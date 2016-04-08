@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Stack;
 
 /**
@@ -207,6 +208,16 @@ public class CapGraph implements Graph {
 		}
 		else {
 			throw new Exception("Vertex " + v + " not found");
+		}
+	}
+	
+	public Set<Integer> getNeighborsSet(int v) {
+		try {
+			return new HashSet<Integer>(this.getNeighbors(v));
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
 		}
 	}
 }
