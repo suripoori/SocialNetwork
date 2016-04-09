@@ -211,13 +211,11 @@ public class CapGraph implements Graph {
 		}
 	}
 	
-	public Set<Integer> getNeighborsSet(int v) {
-		try {
-			return new HashSet<Integer>(this.getNeighbors(v));
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
+	public Set<Integer> getNeighborsSet(int v) throws Exception{
+		return new HashSet<Integer>(this.getNeighbors(v));
+	}
+	
+	public int getNumNeighbors(int v) throws Exception {
+		return this.getNeighbors(v).size();
 	}
 }

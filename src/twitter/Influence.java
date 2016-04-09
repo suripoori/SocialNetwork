@@ -4,11 +4,16 @@ import java.util.List;
 
 public abstract class Influence {
 	
-	private TwitterNetwork tn;
+	protected TwitterNetwork t;
 	
-	public Influence() {
-		tn = new TwitterNetwork();
+	public Influence(TwitterNetwork t) {
+		this.t = t;
 	}
+	
+	protected TwitterNetwork getTwitterNetwork() {
+		return t;
+	}
+	
 	/* Gets ordering of the Users based on the followers */
 	public abstract List<Integer> getFollowersOrdering(Integer numIterations);
 	

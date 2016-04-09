@@ -35,5 +35,8 @@ public interface Graph {
     public int getNumEdges();
     
     /* Returns the neighbors of a vertex */
-    public Set<Integer> getNeighborsSet(int v);
+    public Set<Integer> getNeighborsSet(int v) throws Exception;
+    
+    /* Returns the number of neighbors of a vertex */
+    public int getNumNeighbors(int v) throws Exception; 
 } 
