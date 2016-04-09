@@ -6,11 +6,12 @@ import static org.junit.Assert.*;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
 
-public class graphTester {
+public class GraphTester {
 	public Graph graph1;
 	public Graph graph2;
 	public Graph graph3;
@@ -227,6 +228,86 @@ public class graphTester {
 		catch(Exception e) {
 			e.printStackTrace();
 			fail("Adding a lot of edges between existing vertices causes exception");
+		}
+	}
+	
+	@Test
+	public void testGetNumNeighbors() {
+		graph1.addVertex(1);
+		try{
+			if (graph1.getNumNeighbors(1) != 0){
+				fail("New vertex's number of neighbors is non zero: " + graph1.getNumNeighbors(1));
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+			fail("Getting number of neighbors of new vertex throws error");
+		}
+		graph1.addVertex(2);
+		graph1.addEdge(1, 2);
+		try{
+			if (graph1.getNumNeighbors(1) != 1) {
+				fail("A single edge should mean a single neighbor: " + graph1.getNumNeighbors(1));
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+			fail("Getting number of neighbors of a vertex with single edge throws error");
+		}
+		for (int i=3; i<1000000; i++) {
+			graph1.addVertex(i);
+			graph1.addEdge(1, i);
+		}
+		try {
+			if (graph1.getNumNeighbors(1) != 999998) {
+				fail("Scale testing failed: " + graph1.getNumNeighbors(1));
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			fail("Getting number of neighbors of a large test case caused exception\n" + e.getStackTrace());
+		}
+	}
+	
+	@Test
+	public void testGetNeighborsSet() {
+		graph1.addVertex(1);
+		try{
+			if (graph1.getNeighborsSet(1).size() != 0){
+				fail("New vertex's number of neighbors is non zero: " + graph1.getNeighborsSet(1));
+			}
+		} catch(Exception e) {
+			fail("Getting number of neighbors of new vertex throws error: \n" + e.getStackTrace());
+		}
+		graph1.addVertex(2);
+		graph1.addEdge(1, 2);
+		try{
+			if (graph1.getNeighborsSet(1).size() != 1) {
+				fail("A single edge should mean a single neighbor: " + graph1.getNeighborsSet(1));
+			}
+			if (!graph1.getNeighborsSet(1).contains(2)) {
+				fail("Neighbors set of 1 does not contain 2: " + graph1.getNeighborsSet(1));
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+			fail("Getting neighbors of a vertex with single edge throws error");
+		}
+		for (int i=3; i<1000000; i++) {
+			graph1.addVertex(i);
+			graph1.addEdge(1, i);
+		}
+		try {
+			if (graph1.getNeighborsSet(1).size() != 999998) {
+				fail("Scale testing failed: " + graph1.getNeighborsSet(1).size());
+			}
+			Set<Integer> neighborsSet = graph1.getNeighborsSet(1);
+			for (int i=2; i<1000000; i++) {
+				if (!neighborsSet.contains(i)) {
+					fail("Scale testing failed. Neighbors set does not contain " + i);
+				}
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			fail("Getting neighbors of a large test case caused exception\n" + e.getStackTrace());
 		}
 	}
 	
