@@ -39,4 +39,7 @@ public interface Graph {
     
     /* Returns the number of neighbors of a vertex */
     public int getNumNeighbors(int v) throws Exception; 
+    
+    /* Checks if a vertex is present in the graph */
+    public boolean isVertex(int v);
 } 

@@ -2,7 +2,11 @@ package twitter;
 
 import graph.Graph;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import graph.CapGraph;
@@ -41,17 +45,38 @@ public class TwitterNetwork {
 		follows.addVertex(u);
 	}
 	
-	public void addRetweetUser(Integer r) {
+	public void addRetweetUser(Integer r) throws Exception {
+		if (!follows.isVertex(r) || !followedBy.isVertex(r)) {
+			throw new Exception("User " + r + " does not exist in the social graph");
+		}
 		retweets.addVertex(r);
 		retweetedBy.addVertex(r);
 	}
 	
-	public void addFollowsLink(Integer u1, Integer u2) {
+	public void addFollowsLink(Integer u1, Integer u2) throws Exception {
+		if (!follows.isVertex(u1) || !followedBy.isVertex(u1)) {
+			throw new Exception("User " + u1 + " does not exist in the social graph");
+		}
+		if (!follows.isVertex(u2) || !followedBy.isVertex(u2)) {
+			throw new Exception("User " + u2 + " does not exist in the social graph");
+		}
 		followedBy.addEdge(u2, u1);
 		follows.addEdge(u1, u2);
 	}
 	
-	public void addRetweetsLink(Integer r1, Integer r2) {
+	public void addRetweetsLink(Integer r1, Integer r2) throws Exception {
+		if (!follows.isVertex(r1) || !followedBy.isVertex(r1)) {
+			throw new Exception("User " + r1 + " does not exist in the social graph");
+		}
+		if (!follows.isVertex(r2) || !followedBy.isVertex(r2)) {
+			throw new Exception("User " + r2 + " does not exist in the social graph");
+		}
+		if (!retweets.isVertex(r1) || !retweetedBy.isVertex(r1)) {
+			throw new Exception("User " + r1 + " does not exist in the social graph");
+		}
+		if (!retweets.isVertex(r2) || !retweetedBy.isVertex(r2)) {
+			throw new Exception("User " + r2 + " does not exist in the social graph");
+		}
 		retweets.addEdge(r1, r2);
 		retweetedBy.addEdge(r2, r1);
 	}
@@ -133,5 +158,14 @@ public class TwitterNetwork {
 			e.printStackTrace();
 			throw new Exception("User " + u + " not present");
 		}
+	}
+	
+	public Map<String, HashMap<Integer, HashSet<Integer>>> exportGraphs() {
+		Map<String, HashMap<Integer, HashSet<Integer>>> returnMap = new HashMap<String, HashMap<Integer, HashSet<Integer>>>();
+		returnMap.put("follows", follows.exportGraph());
+		returnMap.put("followedBy", followedBy.exportGraph());
+		returnMap.put("retweets", retweets.exportGraph());
+		returnMap.put("retweetedBy", retweetedBy.exportGraph());
+		return returnMap;
 	}
 }

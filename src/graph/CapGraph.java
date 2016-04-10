@@ -150,6 +150,23 @@ public class CapGraph implements Graph {
 		return this.numEdges;
 	}
 	
+	public Set<Integer> getNeighborsSet(int v) throws Exception{
+		return new HashSet<Integer>(this.getNeighbors(v));
+	}
+	
+	public int getNumNeighbors(int v) throws Exception {
+		return this.getNeighbors(v).size();
+	}
+	
+	public boolean isVertex(int v) {
+		if (this.adjListMap.containsKey(v)) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	
 	private Stack<Integer> DFS(List<Graph> SCCs, CapGraph g, Stack<Integer> vertices) {
 		HashSet<Integer> visited = new HashSet<Integer>();
 		Stack<Integer> finished = new Stack<Integer>();
@@ -209,13 +226,5 @@ public class CapGraph implements Graph {
 		else {
 			throw new Exception("Vertex " + v + " not found");
 		}
-	}
-	
-	public Set<Integer> getNeighborsSet(int v) throws Exception{
-		return new HashSet<Integer>(this.getNeighbors(v));
-	}
-	
-	public int getNumNeighbors(int v) throws Exception {
-		return this.getNeighbors(v).size();
 	}
 }
