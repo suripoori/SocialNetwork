@@ -12,6 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import twitter.TwitterNetwork;
+import util.TwitterNetworkLoader;
 
 public class TwitterNetworkTester {
 	public TwitterNetwork tn1;
@@ -124,6 +125,25 @@ public class TwitterNetworkTester {
 			testAddRetweetsLinkValidity(tn1, vertexList);
 		} catch(Exception e) {
 			fail("addRetweetsLink between existing social users and retweet users raises exception " + e.getMessage());
+		}
+	}
+	
+	@Test
+	public void testSmallTwitterData(){
+		try{
+			TwitterNetworkLoader.loadTwitterNetwork(tn1, "data/small_test_graph.txt", "data/small_test_retweets_graph.txt");
+			
+		} catch(Exception e) {
+			fail("Failure when loading a small twitter network " + e.getMessage() + " " + e.getStackTrace());
+		}
+	}
+	
+	@Test
+	public void testLargeTwitterData(){
+		try{
+			TwitterNetworkLoader.loadTwitterNetwork(tn2, "data/higgs-social_network.edgelist", "data/higgs-retweet_network.edgelist");
+		} catch(Exception e) {
+			fail("Exception when loading a large twitter network " + e.getMessage() + " " + e.getStackTrace());
 		}
 	}
 	
