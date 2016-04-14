@@ -26,24 +26,26 @@ public class PageRankInfluence extends Influence {
 	public List<Integer> getFollowersOrdering(Integer numIterations) {
 		// TODO Auto-generated method stub
 		List<Integer> ordering = new ArrayList<Integer>();
-		double defaultPageRank = 1/getTwitterNetwork().getNumSocialUsers();
-		Queue<PageRank> pageRankQueue = new PriorityQueue<PageRank>();
-		Map<Integer, Double> pageRankMap = new HashMap<Integer, Double>();
-		// Initialize pageRankMap with default page ranks
-		for (Integer user : getTwitterNetwork().getSocialUsers()) {
-			pageRankMap.put(user, defaultPageRank);
-		}
-		// Update the page ranks for the required number of iterations
-		for (int i = 0; i<numIterations; i++) {
-			updatePageRanks(pageRankMap);
-		}
-		// Put all the page ranks into the pageRankQueue to get the ordering based on the ranks
-		for (Integer user : pageRankMap.keySet()) {
-			pageRankQueue.add(new PageRank(user, pageRankMap.get(user)));
-		}
-		// Populate the ordering list with the ordering obtained in the queue.
-		while(!pageRankQueue.isEmpty()) {
-			ordering.add(pageRankQueue.poll().vertex);
+		if(getTwitterNetwork().getNumSocialUsers() > 0){
+			double defaultPageRank = 1/getTwitterNetwork().getNumSocialUsers();
+			Queue<PageRank> pageRankQueue = new PriorityQueue<PageRank>();
+			Map<Integer, Double> pageRankMap = new HashMap<Integer, Double>();
+			// Initialize pageRankMap with default page ranks
+			for (Integer user : getTwitterNetwork().getSocialUsers()) {
+				pageRankMap.put(user, defaultPageRank);
+			}
+			// Update the page ranks for the required number of iterations
+			for (int i = 0; i<numIterations; i++) {
+				updateSocialPageRanks(pageRankMap);
+			}
+			// Put all the page ranks into the pageRankQueue to get the ordering based on the ranks
+			for (Integer user : pageRankMap.keySet()) {
+				pageRankQueue.add(new PageRank(user, pageRankMap.get(user)));
+			}
+			// Populate the ordering list with the ordering obtained in the queue.
+			while(!pageRankQueue.isEmpty()) {
+				ordering.add(pageRankQueue.poll().vertex);
+			}
 		}
 		return ordering;
 	}
@@ -51,10 +53,32 @@ public class PageRankInfluence extends Influence {
 	@Override
 	public List<Integer> getRetweetOrdering(Integer numIterations) {
 		// TODO Auto-generated method stub
-		return null;
+		List<Integer> ordering = new ArrayList<Integer>();
+		if (getTwitterNetwork().getNumRetweetUsers() > 0){
+			double defaultPageRank = 1/getTwitterNetwork().getNumRetweetUsers();
+			Queue<PageRank> pageRankQueue = new PriorityQueue<PageRank>();
+			Map<Integer, Double> pageRankMap = new HashMap<Integer, Double>();
+			// Initialize pageRankMap with default page ranks
+			for (Integer user : getTwitterNetwork().getRetweetUsers()) {
+				pageRankMap.put(user, defaultPageRank);
+			}
+			// Update the page ranks for the required number of iterations
+			for (int i = 0; i<numIterations; i++) {
+				updateRetweetPageRanks(pageRankMap);
+			}
+			// Put all the page ranks into the pageRankQueue to get the ordering based on the ranks
+			for (Integer user : pageRankMap.keySet()) {
+				pageRankQueue.add(new PageRank(user, pageRankMap.get(user)));
+			}
+			// Populate the ordering list with the ordering obtained in the queue.
+			while(!pageRankQueue.isEmpty()) {
+				ordering.add(pageRankQueue.poll().vertex);
+			}
+		}
+		return ordering;
 	}
 
-	private void updatePageRanks(Map<Integer, Double> pageRankMap) {
+	private void updateSocialPageRanks(Map<Integer, Double> pageRankMap) {
 		// Store updated pageRanks for iteration t+1 in this map
 		Map<Integer, Double> newPageRankMap = new HashMap<Integer, Double>();
 		
@@ -63,6 +87,28 @@ public class PageRankInfluence extends Influence {
 			try {
 				for (Integer follower : getTwitterNetwork().getFollowersOfUser(user)) {
 					userPageRank += (dampingFactor * pageRankMap.get(follower)/getTwitterNetwork().getNumUsersFollowedBy(follower)); 
+				}
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			newPageRankMap.put(user, userPageRank);
+		}
+		// Copy iteration t+1's pageRanks into the pageRankMap
+		for (Integer user : newPageRankMap.keySet()) {
+			pageRankMap.put(user, newPageRankMap.get(user));
+		}
+	}
+	
+	private void updateRetweetPageRanks(Map<Integer, Double> pageRankMap) {
+		// Store updated pageRanks for iteration t+1 in this map
+		Map<Integer, Double> newPageRankMap = new HashMap<Integer, Double>();
+		
+		for(Integer user : getTwitterNetwork().getRetweetUsers()) {
+			double userPageRank = (1-dampingFactor)/getTwitterNetwork().getNumRetweetUsers();
+			try {
+				for (Integer retweeter : getTwitterNetwork().getRetweetersOfUser(user)) {
+					userPageRank += (dampingFactor * pageRankMap.get(retweeter)/getTwitterNetwork().getNumUsersRetweetedBy(retweeter)); 
 				}
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
