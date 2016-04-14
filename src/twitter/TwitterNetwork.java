@@ -29,7 +29,7 @@ public class TwitterNetwork {
 	}
 	
 	public int getNumRetweetUsers() {
-		return retweets.getNumEdges();
+		return retweets.getNumVertices();
 	}
 	
 	public Set<Integer> getSocialUsers() {
