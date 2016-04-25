@@ -30,9 +30,10 @@ public class KatzInfluence extends Influence {
 		
 		// For each vertex, find its Katz centrality computation and store it in this priority queue
 		Queue<KatzCentrality> kcQueue = new PriorityQueue<KatzCentrality>();
-		for(Integer u: this.t.getSocialUsers()){
+		Set<Integer> socialUsers = getTwitterNetwork().getSocialUsers();
+		for(Integer u: socialUsers){
 			System.out.println("Getting KatzCentrality of " + u);
-			kcQueue.add(this.getSocialKatzCentrality(u, numLevels));
+			kcQueue.add(this.getSocialKatzCentrality(u, numLevels, socialUsers));
 		}
 		
 		// Make a List out of this priority queue and return it
@@ -49,8 +50,9 @@ public class KatzInfluence extends Influence {
 		// TODO Auto-generated method stub
 		// For each vertex, find its Katz centrality computation and store it in this priority queue
 		Queue<KatzCentrality> kcQueue = new PriorityQueue<KatzCentrality>();
-		for(Integer u: this.t.getRetweetUsers()) {
-			kcQueue.add(this.getRetweetsKatzCentrality(u, numLevels));
+		Set<Integer> retweetUsers = getTwitterNetwork().getRetweetUsers();
+		for(Integer u: retweetUsers) {
+			kcQueue.add(this.getRetweetsKatzCentrality(u, numLevels, retweetUsers));
 		}
 		
 		// Make a list out of this priority queue and return it
@@ -62,10 +64,9 @@ public class KatzInfluence extends Influence {
 		return retweetsOrdering;
 	}
 
-	private KatzCentrality getSocialKatzCentrality(int u, int levels) {
+	private KatzCentrality getSocialKatzCentrality(int u, int levels, Set<Integer> socialUsers) {
 		//Returns a KatzCentrality object for the user 'u' in the social graph
 		KatzCentrality kc = new KatzCentrality(u, 0);
-		Set<Integer> socialUsers = this.t.getSocialUsers();
 		Set<Integer> visitedUsers = new HashSet<Integer>();
 		for (int level = 1; level <= levels; level++) {
 			//System.out.println("Getting users who are at level: " + level);
@@ -116,10 +117,9 @@ public class KatzInfluence extends Influence {
 		return(false);
 	}
 	
-	private KatzCentrality getRetweetsKatzCentrality(int u, int levels) {
+	private KatzCentrality getRetweetsKatzCentrality(int u, int levels, Set<Integer> retweetUsers) {
 		//Returns a KatzCentrality object for the user u in the retweets graph
 		KatzCentrality kc = new KatzCentrality(u, 0);
-		Set<Integer> retweetUsers = this.t.getRetweetUsers();
 		Set<Integer> visitedUsers = new HashSet<Integer>();
 		for (int level = 1; level <= levels; level++) {
 			for (Integer v : retweetUsers) {
