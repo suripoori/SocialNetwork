@@ -8,11 +8,11 @@ import org.junit.Before;
 import org.junit.Test;
 
 import twitter.Influence;
-import twitter.PageRankInfluence;
+import twitter.KatzInfluence;
 import twitter.TwitterNetwork;
 import util.TwitterNetworkLoader;
 
-public class PageRankInfluenceTester {
+public class KatzInfluenceTester {
 	private Influence influence;
 	
 	private TwitterNetwork tn_small;
@@ -30,17 +30,17 @@ public class PageRankInfluenceTester {
 	@Test
 	public void testConstructor(){
 		try{
-			influence = new PageRankInfluence(tn_small);
+			influence = new KatzInfluence(tn_small);
 		} catch(Exception e){
-			fail("Exception occured when creating a PageRankInfluence instance from small graph: " + e.getMessage() + " " + e.getStackTrace());
+			fail("Exception occured when creating a KatzInfluence instance from small graph: " + e.getMessage() + " " + e.getStackTrace());
 		}
 	}
 	
 	@Test
 	public void testGetFollowersOrderingSmallGraph(){
 		try{
-			influence = new PageRankInfluence(tn_small);
-			List<Integer> ordering = influence.getFollowersOrdering(10);
+			influence = new KatzInfluence(tn_small);
+			List<Integer> ordering = influence.getFollowersOrdering(6);
 			if (ordering.size() != tn_small.getNumSocialUsers()) {
 				fail("Ordering does not contain the same number of users as the network: Ordering users = " + ordering.size() + " network users = " + tn_small.getNumSocialUsers());
 			}
@@ -65,8 +65,8 @@ public class PageRankInfluenceTester {
 			}
 		}
 		try {
-			influence = new PageRankInfluence(tn);
-			List<Integer> ordering = influence.getFollowersOrdering(100);
+			influence = new KatzInfluence(tn);
+			List<Integer> ordering = influence.getFollowersOrdering(6);
 			for(int i=0; i<5; i++){
 				if(ordering.get(i) != i){
 					fail("Ordering is different from the expected ordering: " + ordering);
@@ -80,8 +80,8 @@ public class PageRankInfluenceTester {
 	@Test
 	public void testGetFollowersOrderingEmptyGraph(){
 		try{
-			influence = new PageRankInfluence(tn);
-			List<Integer> ordering = influence.getFollowersOrdering(100);
+			influence = new KatzInfluence(tn);
+			List<Integer> ordering = influence.getFollowersOrdering(6);
 			if(ordering.size() != 0){
 				fail("Ordering size for empty graph is not 0: " + ordering.size());
 			}
@@ -94,8 +94,8 @@ public class PageRankInfluenceTester {
 	public void testGetFollowersOrderingLargeGraph(){
 		try{
 			TwitterNetworkLoader.loadTwitterNetwork(tn_large, "data/higgs-social_network.edgelist", "data/higgs-retweet_network.edgelist");
-			influence = new PageRankInfluence(tn_large);
-			List<Integer> ordering = influence.getFollowersOrdering(10);
+			influence = new KatzInfluence(tn_large);
+			List<Integer> ordering = influence.getFollowersOrdering(6);
 			if (ordering.size() != tn_large.getNumSocialUsers()) {
 				fail("Ordering does not have the same number of users as the graph: Ordering users = " + ordering.size() + " network users = " + tn_large.getNumSocialUsers());
 			}
@@ -107,8 +107,8 @@ public class PageRankInfluenceTester {
 	@Test
 	public void testGetRetweetOrderingSmallGraph(){
 		try{
-			influence = new PageRankInfluence(tn_small);
-			List<Integer> ordering = influence.getRetweetOrdering(10);
+			influence = new KatzInfluence(tn_small);
+			List<Integer> ordering = influence.getRetweetOrdering(6);
 			if (ordering.size() != tn_small.getNumRetweetUsers()) {
 				fail("Ordering does not contain the same number of users as the network: Ordering users = " + ordering.size() + " network users = " + tn_small.getNumRetweetUsers());
 			}
@@ -139,8 +139,8 @@ public class PageRankInfluenceTester {
 			}
 		}
 		try {
-			influence = new PageRankInfluence(tn);
-			List<Integer> ordering = influence.getRetweetOrdering(100);
+			influence = new KatzInfluence(tn);
+			List<Integer> ordering = influence.getRetweetOrdering(6);
 			for(int i=0; i<5; i++){
 				if(ordering.get(i) != i){
 					fail("Ordering is different from the expected ordering: " + ordering);
@@ -154,8 +154,8 @@ public class PageRankInfluenceTester {
 	@Test
 	public void testGetRetweetOrderingEmptyGraph(){
 		try{
-			influence = new PageRankInfluence(tn);
-			List<Integer> ordering = influence.getRetweetOrdering(100);
+			influence = new KatzInfluence(tn);
+			List<Integer> ordering = influence.getRetweetOrdering(6);
 			if(ordering.size() != 0){
 				fail("Ordering size for empty graph is not 0: " + ordering.size());
 			}
@@ -168,7 +168,7 @@ public class PageRankInfluenceTester {
 	public void testGetRetweetOrderingLargeGraph(){
 		try{
 			TwitterNetworkLoader.loadTwitterNetwork(tn_large, "data/higgs-social_network.edgelist", "data/higgs-retweet_network.edgelist");
-			influence = new PageRankInfluence(tn_large);
+			influence = new KatzInfluence(tn_large);
 			List<Integer> ordering = influence.getRetweetOrdering(10);
 			if (ordering.size() != tn_large.getNumRetweetUsers()) {
 				fail("Ordering does not have the same number of users as the graph: Ordering users = " + ordering.size() + " network users = " + tn_large.getNumRetweetUsers());
